@@ -32,8 +32,8 @@ async def favicon():
 
 def is_armstrong(n: int) -> bool:
     """Check if a number is an Armstrong number."""
-    digits = [int(d) for d in str(n)]
-    return n == sum(d**len(digits) for d in digits)
+    digits = [int(d) for d in str(abs(n))]  # Ensure works for negative numbers
+    return abs(n) == sum(d**len(digits) for d in digits)
 
 def is_prime(n: int) -> bool:
     """Check if a number is a prime number."""
@@ -48,23 +48,24 @@ def is_perfect(n: int) -> bool:
     """Check if a number is a perfect number."""
     if n < 2:
         return False
-    divisors = [i for i in range(1, n) if n % i == 0]
-    return sum(divisors) == n  # ✅ FIXED: Should compare sum(divisors) to n, not 0
+    divisors = [i for i in range(1, abs(n)) if n % i == 0]
+    return sum(divisors) == abs(n)  # Fix: Compare sum(divisors) to abs(n)
 
-def get_fun_fact(n: int) -> str:
+def get_fun_fact(n: float) -> str:
     """Get a fun fact from Numbers API."""
-    response = requests.get(f"http://numbersapi.com/{n}/math?json")
+    response = requests.get(f"http://numbersapi.com/{int(n)}/math?json")  # Convert float to int
     if response.status_code == 200:
         data = response.json()
-        return data.get("text", "No fun fact available.")  # ✅ Ensure it returns a string
+        return data.get("text", "No fun fact available.")  # Ensure string response
     return "No fun fact available."
 
-def validate_number(number: str) -> int:
-    """Validate and convert the input number to an integer."""
+def validate_number(number: str) -> float:
+    """Validate and convert the input number to an integer or float."""
     try:
-        return int(number)
+        num = float(number)  # Accepts integers and floating-point numbers
+        return num
     except ValueError:
-        return None  # ✅ Return None if input is invalid
+        return None  # Return None for invalid input
 
 @app.get("/api/classify-number")
 async def classify_number(number: str = Query(..., description="The number to classify")):
@@ -74,17 +75,22 @@ async def classify_number(number: str = Query(..., description="The number to cl
     if num is None:
         return JSONResponse(
             status_code=400,
-            content={"number": number, "error": True}
+            content={"number": number, "error": True},
+            headers={"Content-Type": "application/json"}
         )
 
-    properties = ["armstrong"] if is_armstrong(num) else []
-    properties.append("even" if num % 2 == 0 else "odd")
+    properties = ["armstrong"] if is_armstrong(int(num)) else []
+    properties.append("even" if int(num) % 2 == 0 else "odd")
 
-    return {
-        "number": num,
-        "is_prime": is_prime(num),
-        "is_perfect": is_perfect(num),
-        "properties": properties,
-        "digit_sum": sum(int(digit) for digit in str(num)), 
-        "fun_fact": get_fun_fact(num)  # ✅ Ensures fun_fact is always a string
-    }
+    return JSONResponse(
+        status_code=200,
+        content={
+            "number": num,  # ✅ Supports floats, negatives
+            "is_prime": is_prime(int(num)),
+            "is_perfect": is_perfect(int(num)),
+            "properties": properties,
+            "digit_sum": sum(int(digit) for digit in str(abs(int(num)))), 
+            "fun_fact": get_fun_fact(num)  # ✅ Ensures fun_fact is always a string
+        },
+        headers={"Content-Type": "application/json"}
+    )
