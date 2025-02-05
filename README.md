@@ -79,8 +79,12 @@ API endpoint: http://127.0.0.1:8000/api/classify-number?number=371
 swagger UI documentation: http://127.0.0.1:8000/docs
 
 ## deploy to AWS
+<<<<<<< HEAD
 https://dev.to/papit8/configuring-nginx-web-server-on-amazon-ec2-my-experience-45nf
 
 
 
   
+=======
+https://dev.to/papit8/configuring-nginx-web-server-on-amazon-ec2-my-experience-45nf
+>>>>>>> updated main.py
