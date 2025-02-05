@@ -1,7 +1,6 @@
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import JSONResponse, FileResponse
+from fastapi.responses import JSONResponse
 import requests
 
 app = FastAPI(title="Number Classification API")
@@ -15,32 +14,17 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-"""Mount static directory for serving static files like favicon.ico."""
-app.mount("/static", StaticFiles(directory="static"), name="static")
-
-"""Root endpoint with a welcome message"""
-@app.get("/")
-async def read_root():
-    return {
-        "message": "Welcome to the Number Classification API! Use /api/classify-number?number=<number> to classify a number."
-    }
-
-"""Favicon endpoint to serve the favicon.ico file."""
-@app.get("/favicon.ico", include_in_schema=False)
-async def favicon():
-    return FileResponse("static/favicon.ico")
-
 def is_armstrong(n: int) -> bool:
     """Check if a number is an Armstrong number."""
-    digits = [int(d) for d in str(abs(n))]  # Ensure works for negative numbers
+    digits = [int(d) for d in str(abs(n))]  # Works for negative numbers
     return abs(n) == sum(d**len(digits) for d in digits)
 
 def is_prime(n: int) -> bool:
     """Check if a number is a prime number."""
     if n < 2:
         return False
-    for i in range(2, int(n**0.5) + 1):
-        if n % i == 0:
+    for i in range(2, int(abs(n) ** 0.5) + 1):
+        if abs(n) % i == 0:
             return False
     return True
 
@@ -48,18 +32,18 @@ def is_perfect(n: int) -> bool:
     """Check if a number is a perfect number."""
     if n < 2:
         return False
-    divisors = [i for i in range(1, abs(n)) if n % i == 0]
-    return sum(divisors) == abs(n)  # Fix: Compare sum(divisors) to abs(n)
+    divisors = [i for i in range(1, abs(n)) if abs(n) % i == 0]
+    return sum(divisors) == abs(n)  # Compare sum(divisors) to abs(n)
 
 def get_fun_fact(n: float) -> str:
     """Get a fun fact from Numbers API."""
     response = requests.get(f"http://numbersapi.com/{int(n)}/math?json")  # Convert float to int
     if response.status_code == 200:
         data = response.json()
-        return data.get("text", "No fun fact available.")  # Ensure string response
+        return str(data.get("text", "No fun fact available."))  # Ensure response is a string
     return "No fun fact available."
 
-def validate_number(number: str) -> float:
+def validate_number(number: str):
     """Validate and convert the input number to an integer or float."""
     try:
         num = float(number)  # Accepts integers and floating-point numbers
