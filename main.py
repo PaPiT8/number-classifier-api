@@ -71,4 +71,4 @@ def classify_number():
     return jsonify(result), 200  # Always return 200 for valid numbers
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8000)  # Make the API publicly accessible
+    app.run(host='0.0.0.0', port=80)  # Make the API publicly accessible
