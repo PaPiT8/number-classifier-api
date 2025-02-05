@@ -16,12 +16,16 @@
   - checks if the number is a perfect number.
   - calculate the sum of the digits.
   - indicates if the number is odd or even.
+    
 - **fun fact integration:**
   - obtains a fascinating mathematical fact from the numbers API.
+    
 - **CORS enabled:**
   - allows cross-origin requests.
+    
 - **static file handling:**
   - serves a favicon from the static directory.
+    
 - **deployment ready:**
   - configured to run as a serverless function.
 
