@@ -2,7 +2,7 @@
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from .numutils import (
+from numutils import (
     is_prime, 
     is_armstrong_number, 
     get_digit_sum, 
